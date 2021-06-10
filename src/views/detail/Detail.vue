@@ -29,7 +29,7 @@
       <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
     <back-top v-show="isShowBackTop" @click.native="backClick"></back-top>
-    <detail-bottom-bar></detail-bottom-bar>
+    <detail-bottom-bar @addCart='addToCart'></detail-bottom-bar>
   </div>
 </template>
 
@@ -47,12 +47,14 @@ import GoodsList from "components/content/goods/GoodsList";
 import { getDetail, Goods, Shop, getRecommend } from "network/detail";
 
 // 导入mixin
-import { itemListenerMixin } from "common/mixin";
+import { itemListenerMixin ,backTopMixin} from "common/mixin";
 
 import Scroll from "components/common/scroll/Scroll";
-import BackTop from "components/content/backTop/BackTop";
 
+// actions与methods的映射
+import {mapActions} from 'vuex'
 import { debounce } from "common/utils";
+
 
 
 export default {
@@ -71,10 +73,9 @@ export default {
       themeTopYs: [],
       getThemeTop: null,
       currentIndex:0,
-      isShowBackTop: false,
     };
   },
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin,backTopMixin],
   created() {
     // 保存传入的iid
     this.iid = this.$route.params.id;
@@ -83,6 +84,7 @@ export default {
       const data = res.data.result;
       // 1.获取顶部的轮播数据
       // console.log(res);
+      console.log(data)
       this.topImages = data.itemInfo.topImages;
       // 2.获取商品信息
       this.goods = new Goods(
@@ -126,6 +128,7 @@ export default {
     this.$bus.$off("itemImageLoad", this.itemImgListener);
   },
   methods: {
+    ...mapActions(['addCart']),
     detailImageLoad() {
       this.refreshs();
       this.getThemeTop();
@@ -158,10 +161,38 @@ export default {
       // 判断backtop是否显示
       this.isShowBackTop = position.y < -1000;
     },
-    backClick() {
-      //滚回顶部
-      this.$refs.scroll.scroll.scrollTo(0, 0, 500);
-    },
+    // backClick() {
+    //   //滚回顶部
+    //   this.$refs.scroll.scroll.scrollTo(0, 0, 500);
+    // },
+
+    // 添加到购物车
+    addToCart(){
+      // 1.获取购物车中需要展示的信息
+      const product={}
+      product.image=this.topImages[0]
+      product.title=this.goods.title
+      product.desc=this.goods.desc
+      product.price=this.goods.realPrice
+      product.iid=this.iid
+      // 2. 将商品添加到购物车中(vuex)
+      // this.$store.dispatch('addCart',product).then(res=>{
+      //   console.log(res)
+      // })
+
+      // this.addCart(product).then(res=>console.log(res))
+      // this.addCart(product).then(res=>{
+      //   this.message=res
+      //   this.show=true
+      //   setTimeout(()=>{
+      //     this.message=''
+      //     this.show=false
+      //   },1500)
+      // })
+      this.addCart(product).then(res=>{
+        this.$toast.show(res,2000)
+      })
+    }
   },
   components: {
     DetailNavBar,
@@ -174,10 +205,9 @@ export default {
     GoodsList,
     Scroll,
     DetailBottomBar,
-    BackTop,
- 
+
   },
-};
+}
 </script>
 
 <style scoped>

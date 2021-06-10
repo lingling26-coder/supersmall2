@@ -43,7 +43,7 @@ import NavBar from "components/common/navBar/NavBar";
 import TabControl from "components/content/TabControl/TabControl";
 import GoodsList from "components/content/goods/GoodsList";
 import Scroll from "components/common/scroll/Scroll";
-import BackTop from "components/content/backTop/BackTop";
+
 
 //非公共的组件
 import homeSwipper from "./childrenComponents/homeSwipper";
@@ -54,7 +54,7 @@ import FeatureView from "./childrenComponents/FeatureView";
 import { getHomeMultiData, getHomeGoods } from "network/home";
 
 // 导入mixin
-import { itemListenerMixin } from "common/mixin";
+import { itemListenerMixin ,backTopMixin} from "common/mixin";
 
 export default {
   name: "Name",
@@ -69,13 +69,13 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
-      isShowBackTop: false,
+      // isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0,
     };
   },
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin,backTopMixin],
   components: {
     NavBar,
     homeSwipper,
@@ -84,7 +84,7 @@ export default {
     TabControl,
     GoodsList,
     Scroll,
-    BackTop,
+    // BackTop,
   },
   created() {
     //1 请求多个数据
@@ -110,10 +110,10 @@ export default {
       // 所有的组件都有一个属性$el，用于获取组件中的元素
       this.offsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
-    backClick() {
-      //滚回顶部
-      this.$refs.scroll.scroll.scrollTo(0, 0, 500);
-    },
+    // backClick() {
+    //   //滚回顶部
+    //   this.$refs.scroll.scroll.scrollTo(0, 0, 500);
+    // },
     // backtop的显示与隐藏
     scrollPosition(position) {
       // 判断backtop是否显示
